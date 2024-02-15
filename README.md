@@ -2,8 +2,7 @@
 
 **TODO:**
 - apis
-- opentracing
-- jaeger
+- opentracing, jaeger
 - vault
 - istio gateway
 - redis
@@ -11,8 +10,7 @@
 - kafka cluster
 - prometheus
 - grafana
-- elastic search
-- kibana
+- ELK stack
 - helm charts
 - ci/cd configuration
 - single swissknife pod
