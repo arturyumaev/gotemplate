@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
 	"time"
 
@@ -18,15 +17,16 @@ type Application struct {
 	ctx        context.Context
 	cancel     context.CancelFunc
 	httpServer *http.Server
-	exit       *sync.WaitGroup
+	exit       chan bool
 }
 
 func NewApplication() *Application {
 	ctx, cancel := context.WithCancel(context.Background())
+
 	app := &Application{
 		ctx:    ctx,
 		cancel: cancel,
-		exit:   &sync.WaitGroup{},
+		exit:   make(chan bool),
 	}
 
 	handler := server.NewHandler()
@@ -34,28 +34,25 @@ func NewApplication() *Application {
 		Addr:    ":3000",
 		Handler: handler,
 	}
-	go app.handleGracefulShutdown()
+	go app.gracefulShutdown()
 
 	return app
 }
 
 func (app *Application) Run() {
-	app.exit.Add(1)
 	log.Printf("listening on %s\n", app.httpServer.Addr)
-
 	err := app.httpServer.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
 		fmt.Fprintf(os.Stderr, "error listening and serving: %s\n", err)
 	}
 
 	app.cancel()
-	app.exit.Wait()
+	<-app.exit
 }
 
-func (app *Application) handleGracefulShutdown() {
-	defer app.exit.Done()
-
-	// os.Interrupt for CTRL+C, SIGTERM for docker container default signal
+func (app *Application) gracefulShutdown() {
+	// os.Interrupt for CTRL+C
+	// SIGTERM for docker container default signal
 	signalCtx, cancel := signal.NotifyContext(app.ctx, os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
@@ -70,4 +67,6 @@ func (app *Application) handleGracefulShutdown() {
 	if err := app.httpServer.Shutdown(shutdownCtx); err != nil {
 		fmt.Fprintf(os.Stderr, "error shutting down http server: %s\n", err)
 	}
+
+	app.exit <- true
 }
