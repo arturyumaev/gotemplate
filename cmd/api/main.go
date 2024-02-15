@@ -7,7 +7,7 @@ import (
 
 func main() {
 	app := application.NewApplication(
-		"api",
+		version.APIName,
 		version.APIVersion,
 	)
 	app.Run()
