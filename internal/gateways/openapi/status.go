@@ -22,7 +22,7 @@ const (
 	StatusUnavailable        = "Unavailable"
 )
 
-func status(serviceName, serviceVersion string) http.HandlerFunc {
+func Status(serviceName, serviceVersion string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		status := &statusResponse{

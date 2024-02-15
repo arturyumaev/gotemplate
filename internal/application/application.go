@@ -9,52 +9,51 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/arturyumaev/gotemplate/internal/gateways/openapi"
 	"github.com/arturyumaev/gotemplate/version"
 )
 
 type Application struct {
+	Name    string
+	Version string
+
 	ctx    context.Context
 	cancel context.CancelFunc
 	exit   chan bool
 
-	name       string
-	version    string
 	httpServer *http.Server
 	logger     *slog.Logger
 }
 
-func NewApplication(name, version string) *Application {
+func NewApplication() *Application {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
 	app := &Application{
-		ctx:     ctx,
-		cancel:  cancel,
-		exit:    make(chan bool),
-		logger:  logger,
-		name:    name,
-		version: version,
+		ctx:    ctx,
+		cancel: cancel,
+		exit:   make(chan bool),
+		logger: logger,
 	}
-
-	mux := http.NewServeMux()
-	openapi.AddRoutes(mux, name, version)
 
 	app.httpServer = &http.Server{
 		Addr:    ":3000",
-		Handler: mux,
+		Handler: http.DefaultServeMux,
 	}
 
 	return app
 }
 
+func (app *Application) RegisterHTTPHandler(handler http.Handler) {
+	app.httpServer.Handler = handler
+}
+
 func (app *Application) Run() {
 	app.logger.Info(
 		"application started",
+		"name", app.Name,
+		"version", app.Version,
 		"port", app.httpServer.Addr,
-		"name", app.name,
-		"version", app.version,
 		"commit", version.Commit,
 		"buildTime", version.BuildTime,
 	)
