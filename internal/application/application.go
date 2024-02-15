@@ -54,7 +54,7 @@ func (app *Application) Run() {
 func (app *Application) gracefulShutdown() {
 	// os.Interrupt for CTRL+C
 	// SIGTERM for docker container default signal
-	signalCtx, cancel := signal.NotifyContext(app.ctx, os.Interrupt, syscall.SIGTERM)
+	signalCtx, cancel := signal.NotifyContext(app.ctx, os.Interrupt, os.Kill, syscall.SIGTERM)
 	defer cancel()
 
 	// wait for parent or signal context to cancel
