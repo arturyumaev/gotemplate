@@ -39,9 +39,10 @@ func NewApplication() *Application {
 }
 
 func (app *Application) Run() {
+	log.Printf("listening on %s\n", app.httpServer.Addr)
+
 	go app.gracefulShutdown()
 
-	log.Printf("listening on %s\n", app.httpServer.Addr)
 	err := app.httpServer.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
 		fmt.Fprintf(os.Stderr, "error listening and serving: %s\n", err)
@@ -59,7 +60,7 @@ func (app *Application) gracefulShutdown() {
 
 	// wait for parent or signal context to cancel
 	<-signalCtx.Done()
-	fmt.Fprintln(os.Stderr, "gracefully shutting down http server...")
+	fmt.Fprintln(os.Stderr, "shutting down http server...")
 
 	// make a new context for the shutdown
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
