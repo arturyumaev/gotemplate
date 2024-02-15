@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/arturyumaev/gotemplate/internal/gateways/api/openapi"
+	"github.com/arturyumaev/gotemplate/internal/gateways/openapi"
 	"github.com/arturyumaev/gotemplate/version"
 )
 
