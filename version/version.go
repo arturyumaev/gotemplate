@@ -1,10 +1,8 @@
 package version
 
 var (
-	BuildTime = ""
-
-	Commit = ""
-
+	BuildTime  = ""
+	Commit     = ""
 	APIName    = ""
 	APIVersion = ""
 )
