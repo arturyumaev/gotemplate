@@ -34,12 +34,13 @@ func NewApplication() *Application {
 		Addr:    ":3000",
 		Handler: handler,
 	}
-	go app.gracefulShutdown()
 
 	return app
 }
 
 func (app *Application) Run() {
+	go app.gracefulShutdown()
+
 	log.Printf("listening on %s\n", app.httpServer.Addr)
 	err := app.httpServer.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
