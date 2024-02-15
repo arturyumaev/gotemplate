@@ -2,8 +2,7 @@ package application
 
 import (
 	"context"
-	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -11,22 +10,28 @@ import (
 	"time"
 
 	"github.com/arturyumaev/gotemplate/internal/server"
+	"github.com/arturyumaev/gotemplate/version"
 )
 
 type Application struct {
-	ctx        context.Context
-	cancel     context.CancelFunc
+	ctx    context.Context
+	cancel context.CancelFunc
+	exit   chan bool
+
 	httpServer *http.Server
-	exit       chan bool
+	logger     *slog.Logger
 }
 
 func NewApplication() *Application {
 	ctx, cancel := context.WithCancel(context.Background())
 
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
 	app := &Application{
 		ctx:    ctx,
 		cancel: cancel,
 		exit:   make(chan bool),
+		logger: logger,
 	}
 
 	handler := server.NewHandler()
@@ -39,13 +44,22 @@ func NewApplication() *Application {
 }
 
 func (app *Application) Run() {
-	log.Printf("listening on %s\n", app.httpServer.Addr)
+	app.logger.Info(
+		"application started",
+		"port", app.httpServer.Addr,
+		"version", version.Version,
+		"commit", version.Commit,
+		"buildTime", version.BuildTime,
+	)
 
 	go app.gracefulShutdown()
 
 	err := app.httpServer.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
-		fmt.Fprintf(os.Stderr, "error listening and serving: %s\n", err)
+		app.logger.Error(
+			"error listening and serving",
+			"error", err,
+		)
 	}
 
 	app.cancel()
@@ -60,14 +74,17 @@ func (app *Application) gracefulShutdown() {
 
 	// wait for parent or signal context to cancel
 	<-signalCtx.Done()
-	fmt.Fprintln(os.Stderr, "shutting down http server...")
+	app.logger.Info("shutting down http server...")
 
 	// make a new context for the shutdown
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	if err := app.httpServer.Shutdown(shutdownCtx); err != nil {
-		fmt.Fprintf(os.Stderr, "error shutting down http server: %s\n", err)
+		app.logger.Error(
+			"error shutting down http server",
+			"error", err,
+		)
 	}
 
 	app.exit <- true
