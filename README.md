@@ -1,6 +1,6 @@
 # gotemplate
 
-### From mozilla-services:
+**From mozilla-services:**
 
 Containerized App Requirements
 When the application is ran in the container it must:
@@ -13,3 +13,18 @@ When the application is ran in the container it must:
 6. Respond to `/__lbheartbeat__` with an HTTP 200. This is for load balancer checks and should not check backing services.
 7. Send text logs to stdout or stderr.
 8. Serve its own static content.
+
+**TODO:**
+- apis
+- opentracing
+- jaeger
+- redis
+- cassandra
+- kafka cluster
+- prometheus
+- grafana
+- elastic search
+- kibana
+- helm charts
+- ci/cd configuration
+- single swissknife pod

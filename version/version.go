@@ -8,5 +8,5 @@ var (
 	Commit = ""
 
 	// Release is a semantic version of current build
-	Version = ""
+	APIVersion = ""
 )
