@@ -15,6 +15,7 @@ import (
 type Application struct {
 	Name    string
 	Version string
+	Port    string
 
 	ctx    context.Context
 	cancel context.CancelFunc
@@ -48,11 +49,16 @@ func (app *Application) RegisterHTTPHandler(handler http.Handler) {
 }
 
 func (app *Application) Run() {
+	if app.Port == "" {
+		app.Port = "80"
+	}
+	app.httpServer.Addr = ":" + app.Port
+
 	app.logger.Info(
 		"application started",
 		"name", app.Name,
 		"version", app.Version,
-		"port", app.httpServer.Addr,
+		"port", app.Port,
 		"commit", version.Commit,
 		"buildTime", version.BuildTime,
 	)
