@@ -1,16 +1,23 @@
 # gotemplate
 
 **TODO:**
+
+applications:
 - apis
 - opentracing, jaeger
-- vault
-- istio gateway
 - redis
 - cassandra
+- migrations
 - kafka cluster
 - prometheus
 - grafana
-- ELK stack
+- ELK (elastic, logstash, kibana)
 - helm charts
+
+infrastructure:
 - ci/cd configuration
+- kubernetes
+- vault
+- istio gateway
+- docker registry
 - single swissknife pod

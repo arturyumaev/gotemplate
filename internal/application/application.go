@@ -37,7 +37,6 @@ func NewApplication() *Application {
 	}
 
 	app.httpServer = &http.Server{
-		Addr:    ":3000",
 		Handler: http.DefaultServeMux,
 	}
 

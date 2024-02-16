@@ -6,15 +6,21 @@ BUILD_TIME?=$(shell date '+%Y-%m-%dT%H:%M:%S')
 
 api_build: clean
 	go build \
-		-ldflags '-w -s \
+		-ldflags "-w -s \
 		-X ${PROJECT}/version.APIVersion=${VERSION} \
 		-X ${PROJECT}/version.APIName=${NAME} \
 		-X ${PROJECT}/version.Commit=${COMMIT} \
-		-X ${PROJECT}/version.BuildTime=${BUILD_TIME}' \
+		-X ${PROJECT}/version.BuildTime=${BUILD_TIME}" \
 		-o bin/api cmd/api/main.go 
+
+api_build_docker:
+	docker build -t ${NAME}:${VERSION} -f deployments/production/Dockerfile.api .
 
 api_start: api_build
 	./bin/api
+
+api_start_docker: api_build_docker
+	docker run -p 3000:80 ${NAME}:${VERSION} --env-file .env
 
 api_status:
 	curl localhost:3000/status | jq
