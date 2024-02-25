@@ -1,0 +1,16 @@
+networks:
+  development:
+    driver: bridge
+    name: development
+
+services:
+  api:
+    container_name: development.api
+    hostname: development.api
+    image: api:latest
+    networks:
+      - development
+    ports:
+      - ${APPLICATION_PORT}:${APPLICATION_PORT}
+    env_file:
+      - .env

@@ -17,7 +17,7 @@ api_build: clean
 		-o bin/api cmd/api/main.go 
 
 api_build_docker:
-	docker build -t ${NAME}:${VERSION} -f deployments/production/Dockerfile.api .
+	docker build -t ${NAME}:${VERSION} -t ${NAME}:latest -f deployments/production/Dockerfile.api .
 
 api_start: api_build
 	./bin/api
