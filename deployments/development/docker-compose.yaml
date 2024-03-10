@@ -7,7 +7,7 @@ services:
   api:
     container_name: development.api
     hostname: development.api
-    image: api:latest
+    image: arturyumaev/api:latest
     networks:
       - development
     ports:
